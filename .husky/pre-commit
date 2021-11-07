@@ -1,0 +1,5 @@
+#!/bin/sh
+."$(dirmname "$0")/_/husky.sh"
+
+# yarn lint-stagedを実行
+yarn lint-staged

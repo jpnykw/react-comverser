@@ -5,10 +5,13 @@
   "scripts": {
     "build": "tsc",
     "exec": "tsc && node ./dist/index.js",
-    "precommit": "lint-staged"
+    "prepare": "husky install"
   },
   "lint-staged": {
-    "*.{js,json,css,md}": ["prettier --write --single-quote=true --bracket-same-line=true", "git add"]
+    "*.@{ts}": [
+      "prettier --write --single-quote=true --bracket-same-line=true",
+      "git add"
+    ]
   },
   "license": "MIT",
   "dependencies": {
