@@ -23,6 +23,8 @@ const analyze = (rawCode: string, body: any) => {
     return code;
   }
 
+  // console.log(body);
+
   for (const token of Array.isArray(body) ? body : [body]) {
     switch (token.type) {
       case 'ClassDeclaration':
@@ -42,6 +44,7 @@ const analyze = (rawCode: string, body: any) => {
           // Class 内部で定義されてるメソッドを FC 用に変換
           for (const token of Array.isArray(blockStatement.body) ? blockStatement.body : [blockStatement.body]) {
             if (token?.expression?.callee?.type === 'Super') continue; // super() を無視
+            console.log(token);
           }
 
           // console.log('params', params, 'body', blockStatement);
@@ -51,12 +54,16 @@ const analyze = (rawCode: string, body: any) => {
         if (token.kind === 'method') {
           if (token.key.name === 'render') {
             const blockStatement = token.value.body;
-            code += `${rawCode.slice(blockStatement.body[0].start, blockStatement.body[0].end)}\n}`;
+            code += `${rawCode.slice(blockStatement.body[0].start, blockStatement.body[0].end)}\n}\n`;
           } else {
             code += `const ${token.key.name} = () => {\n`;
           }
         }
         break;
+
+        case 'ExportDefaultDeclaration':
+          code += `export default ${token.declaration.name}`;
+          break;
     }
   }
 
@@ -69,6 +76,10 @@ const code = `
   class Component extends React.Component {
     constructor(props) {
       super(props);
+      this.hoge = 123;
+      this.state = {
+        fuga: 456,
+      };
     }
     render() {
       return <h1>Hello, World</h1>
