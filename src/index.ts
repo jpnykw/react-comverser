@@ -70,7 +70,7 @@ const analyze = (rawCode: string, body: any) => {
         if (token.kind === 'method') {
           if (token.key.name === 'render') {
             const blockStatement = token.value.body;
-            code += `${rawCode.slice(blockStatement.body[0].start, blockStatement.body[0].end)}\n}\n`;
+            code += `${rawCode.slice(blockStatement.body[0].start, blockStatement.body[0].end).replace(/this\./g, '')}\n}\n`;
           } else {
             code += `const ${token.key.name} = () => {\n`;
           }
@@ -115,7 +115,12 @@ const code = `
       };
     }
     render() {
-      return <h1>Hello, World</h1>
+      return (
+        <>
+          <div>hoge is {this.hoge}</div>
+          <div>fuga is {this.fuga}</div>
+        </>
+      )
     }
   }
 

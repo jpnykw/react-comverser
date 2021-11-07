@@ -2,13 +2,23 @@
   "name": "react-comverse",
   "version": "1.0.0",
   "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "exec": "tsc && node ./dist/index.js",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,json,css,md}": ["prettier --write --single-quote=true --bracket-same-line=true", "git add"]
+  },
   "license": "MIT",
   "dependencies": {
     "@types/acorn": "^4.0.6",
     "@types/node": "^16.11.6",
     "acorn": "^8.5.0",
     "acorn-jsx": "^5.3.2",
-    "escodegen": "^2.0.0"
+    "escodegen": "^2.0.0",
+    "husky": "^7.0.4",
+    "lint-staged": "^11.2.6"
   },
   "devDependencies": {
     "@zoltu/typescript-transformer-append-js-extension": "^1.0.1",
