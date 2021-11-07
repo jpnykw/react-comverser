@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@zoltu/typescript-transformer-append-js-extension": "^1.0.1",
+    "prettier": "2.4.1",
     "rimraf": "^3.0.2",
     "sirv-cli": "^1.0.14",
     "ttypescript": "^1.5.12",
