@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "star": "tsc && node ./dist/index.js",
+    "dev": "tsc && node ./dist/index.js",
     "lint": "eslint \"src/**/*.{js,ts}\"",
     "lint:fix": "eslint --fix \"src/**/*.{js,ts}\"",
     "test": "jest",
