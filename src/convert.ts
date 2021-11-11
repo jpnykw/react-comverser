@@ -19,12 +19,12 @@ const convert = (rawCode: string, body: any) => {
   for (const token of Array.isArray(body) ? body : [body]) {
     switch (token.type) {
       case 'ImportDeclaration': {
-        code = insert_new_line(code, `${escodegen.generate(token)}\n`)
+        code = insert_new_line(code, `${escodegen.generate(token)}`)
         break
       }
 
       case 'ClassDeclaration': {
-        code = insert_new_line(code, `const ${token.id.name} = (props) => {\n`)
+        code = insert_new_line(code, `const ${token.id.name} = (props) => {`)
         const classBody = token.body
 
         if (classBody.type === 'ClassBody') {
@@ -49,39 +49,61 @@ const convert = (rawCode: string, body: any) => {
             code = insert_new_line(code, convert(rawCode, token))
           }
         }
-
         if (token.kind === 'method') {
           if (token.key.name === 'render') {
             const blockStatement = token.value.body
-            code = insert_new_line(code, `${rawCode.slice(blockStatement.body[0].start, blockStatement.body[0].end).replace(/this\./g, '')}\n}\n`)
+            code = insert_new_line(code, `${rawCode.slice(blockStatement.body[0].start, blockStatement.body[0].end).replace(/this\.(state\.)?/g, '')}${EOL}}`)
           } else {
-            code = insert_new_line(code, `const ${token.key.name} = () => {\n`)
+            const args = token.value.params.map(({ name }: { name: string }) => name)
+            const blockStatement = convert(rawCode, token.value.body.body)
+            code = insert_new_line(code, `const ${token.key.name} = (${args.join(', ')}) => {${EOL}${blockStatement}${EOL}}`)
+            // console.log(token.value.params.map(({ name }: { name: string }) => name))
+            // console.log(escodegen.generate(token.value.body))
           }
         }
         break
       }
 
-        case 'ExpressionStatement': {
-          const operator = token.expression.operator
-          const left = token.expression.left
-          const right = token.expression.right
+      case 'ExpressionStatement': {
+        const operator = token.expression.operator
+        const left = token.expression.left
+        const right = token.expression.right
 
-          if (operator === '=') {
-            // this プロパティに対する代入
-            if (left.type === 'MemberExpression' && left.object.type === 'ThisExpression') {
-              if (left.property.name === 'state') {
-                // state を hooks に置き換える
-                for (const {key, value} of right.properties) {
-                  const name = key.name
-                  code = insert_new_line(code, `const [${name}, set${name[0].toUpperCase()}${name.slice(1, name.length)}] = React.useState(${value.raw})\n`)
-                }
-              } else {
-                code = insert_new_line(code, `const ${left.property.name} = ${escodegen.generate(right)}\n`)
+        if (operator === '=') {
+          // this プロパティに対する代入
+          if (left.type === 'MemberExpression' && left.object.type === 'ThisExpression') {
+            if (left.property.name === 'state') {
+              // state を hooks に置き換える
+              for (const {key, value} of right.properties) {
+                const name = key.name
+                code = insert_new_line(code, `const [${name}, set${name[0].toUpperCase()}${name.slice(1, name.length)}] = React.useState(${value.raw})`)
               }
+            } else {
+              code = insert_new_line(code, `const ${left.property.name} = ${escodegen.generate(right)}`)
             }
           }
-          break
+        } else {
+          code = insert_new_line(code, convert(rawCode, token.expression))
         }
+        break
+      }
+
+      case 'CallExpression': {
+        const { property } = token.callee
+        const args = token.arguments
+
+        if (property.type === 'Identifier' && property.name === 'setState') {
+          for (const arg of args) {
+            const key = arg.properties[0].key
+            const value = arg.properties[0].value
+
+            // TODO: setState の値を変換できるようにする
+            const setState = `set${key.name[0].toUpperCase()}${key.name.slice(1, key.name.length)}(${escodegen.generate(value).replace(/this\.state\./g, '')})`
+            code = insert_new_line(code, setState)
+          }
+        }
+        break
+      }
     }
   }
 

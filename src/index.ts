@@ -9,27 +9,35 @@ const prettierOption = {
   parser: 'babel',
 }
 
-const code: string = `
+const code = `
   import React from 'react';
-
   class Component extends React.Component {
     constructor(props) {
       super(props);
-      this.hoge = 123;
       this.state = {
-        fuga: 456,
+        count: 123,
       };
+    }
+    countUp() {
+      this.setState({
+        count: this.state.count + 1,
+      });
+    }
+    countDown() {
+      this.setState({
+        count: this.state.count - 1,
+      });
     }
     render() {
       return (
         <>
-          <div>hoge is {this.hoge}</div>
-          <div>fuga is {this.fuga}</div>
+          <div>current count: {this.state.count}</div>
+          <button onClick={() => this.countUp()}>count up</button>
+          <button onClick={() => this.countDown()}>count down</button>
         </>
-      )
+      );
     }
   }
-
   export default Component;
 `
 
