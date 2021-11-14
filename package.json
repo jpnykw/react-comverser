@@ -27,10 +27,12 @@
     "@types/prettier": "^2.4.1",
     "acorn": "^8.5.0",
     "acorn-jsx": "^5.3.2",
-    "escodegen": "^2.0.0"
+    "escodegen": "^2.0.0",
+    "minimist": "^1.2.5"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",
+    "@types/minimist": "^1.2.2",
     "@typescript-eslint/eslint-plugin": "^5.3.0",
     "@typescript-eslint/parser": "^5.3.0",
     "@zoltu/typescript-transformer-append-js-extension": "^1.0.1",
